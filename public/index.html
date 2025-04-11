@@ -1,0 +1,45 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Printlify Image Generator</title>
+  
+</head>
+<body>
+  <div id="container">
+    <h1>Printlify Image Generator</h1>
+    <input type="text" id="prompt" placeholder="Print your image"..." />
+    <br />
+    <button onclick="generateImage()">Generate Image</button>
+    <div id="output"></div>
+  </div>
+  <script>
+    async function generateImage() {
+      const prompt = document.getElementById('prompt').value;
+      const output = document.getElementById('output');
+      output.innerHTML = "Loading...";
+
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt }),
+        });
+        const data = await response.json();
+        if (data.image) {
+          // Display the generated image
+          output.innerHTML = `<img src="${data.image}" alt="Generated Image" />`;
+        } else if (data.text) {
+          // Fallback: display any text returned
+          output.innerHTML = `<p>${data.text}</p>`;
+        } else {
+          output.innerHTML = `<p>No image returned.</p>`;
+        }
+      } catch (error) {
+        output.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
